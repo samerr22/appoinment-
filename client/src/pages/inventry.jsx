@@ -1,73 +1,43 @@
-import {
-  getDownloadURL,
-  getStorage,
-  ref,
-  uploadBytesResumable
-} from "firebase/storage";
-import { app } from "../firebase";
-import { useState } from "react";
-import { CircularProgressbar } from "react-circular-progressbar";
-import "react-circular-progressbar/dist/styles.css";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function Inventry() {
-  const [file, setFile] = useState(null);
-  const [imageUploadProgress, setImageUploadProgress] = useState(null);
-  const [imageUploadError, setImageUploadError] = useState(null);
-  const [formData, setFormData] = useState({});
+export default function AppointmentForm() {
+  const [formData, setFormData] = useState({
+    patientName: "",
+    doctorName: "",
+    appointmentDate: "",
+    appointmentTime: "",
+  });
+  const [appointments, setAppointments] = useState([]);
   const [publishError, setPublishError] = useState(null);
   const [Cvalidation, setCValidation] = useState(null);
 
-  console.log(formData);
-
   const navigate = useNavigate();
 
-  const handleUpdloadImage = async () => {
-    try {
-      if (!file) {
-        setImageUploadError("Please select an image");
-        return;
+  // Fetch appointments when the component mounts
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/api/Getappointments");
+        const data = await res.json();
+        setAppointments(data);
+      } catch (error) {
+        console.error("Failed to fetch appointments", error);
       }
-      setImageUploadError(null);
-      const storage = getStorage(app);
-      const fileName = new Date().getTime() + "-" + file.name;
-      const storageRef = ref(storage, fileName);
-      const uploadTask = uploadBytesResumable(storageRef, file);
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setImageUploadProgress(progress.toFixed(0));
-        },
-        (error) => {
-          setImageUploadError("Image upload failed");
-          setImageUploadProgress(null);
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            setImageUploadProgress(null);
-            setImageUploadError(null);
-            setFormData({ ...formData, image: downloadURL });
-          });
-        }
-      );
-    } catch (error) {
-      setImageUploadError("Image upload failed");
-      setImageUploadProgress(null);
-      console.log(error);
-    }
-  };
+    };
+
+    fetchAppointments();
+  }, []); // Empty dependency array ensures this only runs once
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:3000/api/inventoryc", {
+      const res = await fetch("http://localhost:3000/api/appointments", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -77,177 +47,164 @@ export default function Inventry() {
 
       if (res.ok) {
         setPublishError(null);
-        alert("successfull");
-        navigate("");
+        alert("Appointment created successfully");
+        setFormData({
+          patientName: "",
+          doctorName: "",
+          appointmentDate: "",
+          appointmentTime: "",
+        });
+        // Re-fetch appointments to update the list
+        const updatedAppointments = await fetch("http://localhost:3000/api/appointments").then((res) => res.json());
+        setAppointments(updatedAppointments);
       }
     } catch (error) {
       setPublishError("Something went wrong");
     }
   };
 
-  const handlepriceChange = (e) => {
-    const price = e.target.value.trim();
-    const pricePattern = /^[1-9]\d*$/; // Pattern for positive integers
-
-    if (price === "") {
-      setCValidation(null);
-    } else if (!pricePattern.test(price)) {
-      if (isNaN(price)) {
-        setCValidation("price must be a number");
-      } else {
-        setCValidation("price must be a positive integer");
-      }
-    } else {
-      setFormData({ ...formData, price });
-      setCValidation(null);
-    }
-  };
-
   return (
-    <div className="min-h-screen relative flex items-center justify-center bg-white">
-    <div className="relative bg-white mt-14 mb-28 bg-opacity-10 shadow-sm shadow-black w-[900px] max-w-[900px] p-6 md:p-8 rounded-3xl border border-opacity-50 flex flex-col items-center">
-      <div className="flex justify-center items-center">
-        <Link to={`/`}>
-          <button className="text-md hover:text-blue-400 font-serif underline text-blue-600">
-            Back
-          </button>
-        </Link>
-      </div>
-      <div className="my-7 flex items-center justify-center">
-        <h1 className="text-3xl font-serif uppercase text-blue-600">
-          Add Item
-        </h1>
-      </div>
-  
-      <div className="w-[800px] h-[510px] bg-white bg-opacity-90 border shadow-xl rounded-3xl">
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-          <div className="flex gap-4 items-center justify-between border-2 rounded-2xl shadow-xl p-3">
+    <div className="min-h-screen relative flex items-center justify-center bg-gray-100">
+  <div className="relative bg-white w-[90%] max-w-[900px] p-8 md:p-10 rounded-3xl shadow-xl border border-gray-200 flex flex-col items-center">
+    {/* Back Button */}
+    <div className="flex justify-start w-full">
+      <button
+        className="text-lg font-medium text-blue-600 hover:text-blue-400 underline"
+        onClick={() => navigate("/appointments")}
+      >
+        Back
+      </button>
+    </div>
+
+    {/* Header */}
+    <div className="my-7 flex items-center justify-center w-full">
+      <h1 className="text-4xl font-bold text-blue-700 uppercase">Add Appointment</h1>
+    </div>
+
+    {/* Form Section */}
+    <div className="w-full bg-white p-8 rounded-3xl shadow-lg border border-gray-200">
+      <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+        <div className="flex flex-col gap-6 md:flex-row justify-between">
+          <div className="flex-1">
+            <label htmlFor="patientName" className="text-sm font-medium text-gray-700">Patient Name</label>
             <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setFile(e.target.files[0])}
-              className="border border-gray-300 shadow-sm bg-white rounded-md py-2 px-4 focus:outline-none focus:border-blue-500"
-            />
-            <button
-              type="button"
-              className="w-40 h-10 rounded-lg bg-blue-500 uppercase shadow-lg text-white hover:opacity-90"
-              size="sm"
-              onClick={handleUpdloadImage}
-              disabled={imageUploadProgress}
-            >
-              {imageUploadProgress ? (
-                <div className="w-16 h-16">
-                  <CircularProgressbar
-                    value={imageUploadProgress}
-                    text={`${imageUploadProgress || 0}%`}
-                  />
-                </div>
-              ) : (
-                "Upload Image"
-              )}
-            </button>
-          </div>
-          {imageUploadError && (
-            <p className="mt-5 text-red-600 bg-red-300 w-300 h-7 rounded-lg text-center">
-              {imageUploadError}
-            </p>
-          )}
-          {formData.image && (
-            <img
-              src={formData.image}
-              alt="upload"
-              className="w-48 h-20 object-cover"
-            />
-          )}
-  
-          <div className="flex flex-col gap-4 sm:flex-row justify-between">
-            <input
-              className="flex-1 bg-slate-100 shadow-sm shadow-slate-500 p-3 rounded-lg w-[460px] h-11"
+              className="mt-2 w-full bg-slate-100 shadow-sm p-4 rounded-lg text-gray-700 placeholder-gray-500"
               type="text"
-              placeholder=" Name"
+              placeholder="Enter Patient Name"
               required
-              id="name"
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
+              id="patientName"
+              onChange={(e) => setFormData({ ...formData, patientName: e.target.value })}
             />
           </div>
-  
-          <div className="flex justify-center items-center gap-4">
-            <div>
-              <select
-                className="bg-slate-100 shadow-sm shadow-slate-500 p-3 rounded-lg w-[200px] h-15"
-                onChange={(e) =>
-                  setFormData({ ...formData, quantity: e.target.value })
-                }
-              >
-                <option value="">Select</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-              </select>
-            </div>
-            <div>
-              <input
-                className="bg-slate-100 shadow-sm shadow-slate-500 p-3 rounded-lg w-[200px] h-15"
-                type="date"
-                placeholder="Expiredate"
-                required
-                id="Expiredate"
-                onChange={(e) =>
-                  setFormData({ ...formData, Expiredate: e.target.value })
-                }
-              />
-            </div>
-  
-            <div>
-              <input
-                className="bg-slate-100 shadow-sm shadow-slate-500 p-3 rounded-lg w-[200px] h-15"
-                type="text"
-                placeholder="price"
-                required
-                id="price"
-                onChange={handlepriceChange}
-              />
-  
-              {Cvalidation && (
-                <p className="mt-0 text-red-600 h-0 rounded-lg text-center">
-                  {Cvalidation}
-                </p>
-              )}
-            </div>
-          </div>
-  
-          <div className="flex justify-center mt-4 items-center">
-            <textarea
-              type="description"
-              placeholder="description"
-              required
-              id="description"
-              className="flex-1 bg-slate-100 shadow-sm shadow-slate-500 p-3 rounded-lg w-[460px] h-15"
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
-            />
-          </div>
-  
-          <button
-            type="submit"
-            className="bg-blue-500 uppercase text-white border-black p-3 rounded-lg w-[460px] h-11 hover:opacity-90 lg:w-full"
-          >
-            Submit
-          </button>
-  
-          {publishError && (
-            <p className="mt-5 text-red-600 bg-white w-300 h-7 rounded-lg text-center">
-              {publishError}
-            </p>
-          )}
-        </form>
-      </div>
+
+          <div className="flex-1">
+  <label htmlFor="appointmentDay" className="text-sm font-medium text-gray-700">Doctor Name</label>
+  <select
+    id="appointmentTime"
+    required
+    className="mt-2 w-full bg-slate-100 shadow-sm p-4 rounded-lg text-gray-700"
+    onChange={(e) => setFormData({ ...formData, appointmentTime: e.target.value })}
+  >
+    <option value="">Select a Doctors</option>
+    <option value="Dr. Emily Davis">Dr. Emily Davis</option>
+    <option value="Dr. Sarah Johnson">Dr. Sarah Johnson</option>
+    <option value="Dr. John Smith">Dr. John Smith</option>
+    <option value="Dr. Robert Taylor">Dr. Robert Taylor</option>
+    <option value="Dr. Linda Anderson">Dr. Linda Anderson</option>
+    <option value="Dr. Michael Wilson">Dr. Michael Wilson</option>
+    <option value="Dr. Michael Wilson">Dr. Michael Wilson</option>
+  </select>
+</div>
+        </div>
+
+        <div className="flex flex-col gap-6 md:flex-row justify-between">
+        <div className="flex-1">
+  <label htmlFor="appointmentDay" className="text-sm font-medium text-gray-700">Appointment Day</label>
+  <select
+    id="appointmentTime"
+    required
+    className="mt-2 w-full bg-slate-100 shadow-sm p-4 rounded-lg text-gray-700"
+    onChange={(e) => setFormData({ ...formData, appointmentTime: e.target.value })}
+  >
+    <option value="">Select a Day</option>
+    <option value="Monday">Monday</option>
+    <option value="Tuesday">Tuesday</option>
+    <option value="Wednesday">Wednesday</option>
+    <option value="Thursday">Thursday</option>
+    <option value="Friday">Friday</option>
+    <option value="Saturday">Saturday</option>
+    <option value="Sunday">Sunday</option>
+  </select>
+</div>
+
+          <div className="flex-1">
+  <label htmlFor="appointmentTime" className="text-sm font-medium text-gray-700">Appointment Time</label>
+  <select
+    id="appointmentTime"
+    required
+    className="mt-2 w-full bg-slate-100 shadow-sm p-4 rounded-lg text-gray-700"
+    onChange={(e) => setFormData({ ...formData, appointmentTime: e.target.value })}
+  >
+    <option value="">Select a Time</option>
+    
+    <option value="02:00 PM to 04:00 PM">02:00 PM to 04:00 PM</option>
+    <option value="10:00 AM to 12:00 PM">10:00 AM to 12:00 PM</option>
+    <option value="09:30 AM to 11:30 AM">09:30 AM to 11:30 AM</option>
+    <option value="01:00 PM to 03:00 PM">01:00 PM to 03:00 PM</option>
+    <option value="04:00 PM to 06:00 PM">04:00 PM to 06:00 PM</option>
+    <option value="08:00 AM to 10:00 AM">08:00 AM to 10:00 AM</option>
+  </select>
+</div>
+
+        </div>
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          className="mt-6 w-full py-4 bg-blue-600 text-white font-semibold text-lg rounded-lg hover:bg-blue-500 transition duration-300"
+        >
+          Submit
+        </button>
+
+        {/* Error Message */}
+        {publishError && (
+          <p className="mt-5 text-red-600 text-center text-sm">{publishError}</p>
+        )}
+      </form>
     </div>
   </div>
-  
+
+  {/* Appointments Table Section */}
+  <div className="my-8 w-full">
+    <h2 className="text-3xl font-bold text-blue-700 uppercase text-center">Appointments</h2>
+    <table className="table-auto w-full mt-8 bg-white rounded-lg shadow-lg border-collapse">
+      <thead>
+        <tr className="bg-blue-100">
+          <th className="p-4 text-left text-sm font-medium text-gray-700">Doctor Name</th>
+          <th className="p-4 text-left text-sm font-medium text-gray-700">Date</th>
+          <th className="p-4 text-left text-sm font-medium text-gray-700">Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        {appointments.length === 0 ? (
+          <tr>
+            <td colSpan="3" className="p-4 text-center text-sm text-gray-500">
+              No appointments yet.
+            </td>
+          </tr>
+        ) : (
+          appointments.map((appointment) => (
+            <tr key={appointment._id} className="border-b border-gray-200">
+              <td className="p-4 text-sm text-gray-700">{appointment.doctorName}</td>
+              <td className="p-4 text-sm text-gray-700">{appointment.Docdate}</td>
+              <td className="p-4 text-sm text-gray-700">{appointment.Time}</td>
+            </tr>
+          ))
+        )}
+      </tbody>
+    </table>
+  </div>
+</div>
+
   );
 }
