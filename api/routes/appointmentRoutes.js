@@ -12,7 +12,7 @@ import {
 const router = express.Router();
 
 // Create an appointment
-router.post('/appointments', createAppointment);
+router.post('/cappointments', createAppointment);
 
 // Get all appointments
 router.get('/appointments', getAppointments);

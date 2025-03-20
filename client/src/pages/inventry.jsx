@@ -32,7 +32,7 @@ export default function AppointmentForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:3000/api/appointments", {
+      const res = await fetch("http://localhost:3000/api/cappointments", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -54,14 +54,28 @@ export default function AppointmentForm() {
           appointmentDate: "",
           appointmentTime: "",
         });
-        // Re-fetch appointments to update the list
-        const updatedAppointments = await fetch("http://localhost:3000/api/appointments").then((res) => res.json());
-        setAppointments(updatedAppointments);
+        
       }
     } catch (error) {
       setPublishError("Something went wrong");
     }
   };
+
+
+  const handlepriceChange = (e) => {
+    const patientName = e.target.value.trim();
+  
+    // Check if the price is a number
+    if (patientName === "") {
+      setCValidation(null); // Clear any previous validation error
+    } else if (!isNaN(patientName)) {
+      setCValidation("Price cannot be a number");
+    } else {
+      setFormData({ ...formData, patientName });
+      setCValidation(null); // Clear any validation error if it's a valid string
+    }
+  };
+  
 
   return (
     <div className="min-h-screen relative flex items-center justify-center bg-gray-100">
@@ -93,17 +107,22 @@ export default function AppointmentForm() {
               placeholder="Enter Patient Name"
               required
               id="patientName"
-              onChange={(e) => setFormData({ ...formData, patientName: e.target.value })}
+              onChange={handlepriceChange}
             />
+            {Cvalidation && (
+                <p className="mt-0 text-red-600 h-0 rounded-lg text-center">
+                  {Cvalidation}
+                </p>
+              )}
           </div>
 
           <div className="flex-1">
-  <label htmlFor="appointmentDay" className="text-sm font-medium text-gray-700">Doctor Name</label>
+  <label htmlFor="doctorName" className="text-sm font-medium text-gray-700">Doctor Name</label>
   <select
-    id="appointmentTime"
+    id="doctorName"
     required
     className="mt-2 w-full bg-slate-100 shadow-sm p-4 rounded-lg text-gray-700"
-    onChange={(e) => setFormData({ ...formData, appointmentTime: e.target.value })}
+    onChange={(e) => setFormData({ ...formData, doctorName: e.target.value })}
   >
     <option value="">Select a Doctors</option>
     <option value="Dr. Emily Davis">Dr. Emily Davis</option>
@@ -119,12 +138,12 @@ export default function AppointmentForm() {
 
         <div className="flex flex-col gap-6 md:flex-row justify-between">
         <div className="flex-1">
-  <label htmlFor="appointmentDay" className="text-sm font-medium text-gray-700">Appointment Day</label>
+  <label htmlFor="appointmentDate" className="text-sm font-medium text-gray-700">Appointment Day</label>
   <select
-    id="appointmentTime"
+    id="appointmentDate"
     required
     className="mt-2 w-full bg-slate-100 shadow-sm p-4 rounded-lg text-gray-700"
-    onChange={(e) => setFormData({ ...formData, appointmentTime: e.target.value })}
+    onChange={(e) => setFormData({ ...formData, appointmentDate: e.target.value })}
   >
     <option value="">Select a Day</option>
     <option value="Monday">Monday</option>
