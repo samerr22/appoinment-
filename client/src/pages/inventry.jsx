@@ -2,12 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function AppointmentForm() {
-  const [formData, setFormData] = useState({
-    patientName: "",
-    doctorName: "",
-    appointmentDate: "",
-    appointmentTime: "",
-  });
+  const [formData, setFormData] = useState({});
   const [appointments, setAppointments] = useState([]);
   const [publishError, setPublishError] = useState(null);
   const [Cvalidation, setCValidation] = useState(null);
@@ -29,15 +24,17 @@ export default function AppointmentForm() {
     fetchAppointments();
   }, []); // Empty dependency array ensures this only runs once
 
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const res = await fetch("http://localhost:3000/api/cappointments", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formData)
       });
       const data = await res.json();
       if (!res.ok) {
@@ -47,14 +44,8 @@ export default function AppointmentForm() {
 
       if (res.ok) {
         setPublishError(null);
-        alert("Appointment created successfully");
-        setFormData({
-          patientName: "",
-          doctorName: "",
-          appointmentDate: "",
-          appointmentTime: "",
-        });
-        
+        alert("successfull");
+        navigate("");
       }
     } catch (error) {
       setPublishError("Something went wrong");
