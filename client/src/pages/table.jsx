@@ -56,58 +56,66 @@ export default function ManageEmp() {
 
   return (
     <div className="h-[800px] relative">
-      <div className="items-center justify-center flex">
-        <div className="items-center ">
-         
-
-          <div className="lg:w-[1200px] mt-8 rounded-3xl shadow-xl bg-white overflow-hidden">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-              {filter && filter.length > 0 ? (
-                filter.map((course) => (
-                  <div
-                    key={course._id}
-                    className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-all"
-                  >
-                    <h3 className="text-xl font-semibold text-gray-800">
-                      Patient: {course.patientName}
-                    </h3>
-                    <p className="text-gray-600 mt-2">
-                      <strong>Doctor:</strong> {course.doctorName}
-                    </p>
-                    <p className="text-gray-600 mt-2">
-                      <strong>Appointment Date:</strong> {course.appointmentDate}
-                    </p>
-                    <p className="text-gray-600 mt-2">
-                      <strong>Appointment Time:</strong> {course.appointmentTime}
-                    </p>
-
-                    <div className="flex justify-between mt-4">
-                      <Link to={`/updatee/${course._id}`}>
-                        <button className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg shadow-md transition duration-300">
-                          Edit
-                        </button>
-                      </Link>
-                      <button
-                        onClick={() => {
-                          setformId(course._id);
-                          handleDeleteUser();
-                        }}
-                        className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg shadow-md transition duration-300"
-                      >
-                        Delete
+    <div className="items-center justify-center flex">
+      <div className="items-center">
+        {/* Add Appointment Button */}
+        <div className="w-full text-center mt-4 mb-6">
+          <Link to="/add">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-lg shadow-lg transition duration-300">
+              Add Appointment
+            </button>
+          </Link>
+        </div>
+  
+        <div className="lg:w-[1200px] mt-8 rounded-3xl shadow-xl bg-white overflow-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+            {filter && filter.length > 0 ? (
+              filter.map((course) => (
+                <div
+                  key={course._id}
+                  className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-all"
+                >
+                  <h3 className="text-xl font-semibold text-gray-800">
+                    Patient: {course.patientName}
+                  </h3>
+                  <p className="text-gray-600 mt-2">
+                    <strong>Doctor:</strong> {course.doctorName}
+                  </p>
+                  <p className="text-gray-600 mt-2">
+                    <strong>Appointment Date:</strong> {course.appointmentDate}
+                  </p>
+                  <p className="text-gray-600 mt-2">
+                    <strong>Appointment Time:</strong> {course.appointmentTime}
+                  </p>
+  
+                  <div className="flex justify-between mt-4">
+                    <Link to={`/updatee/${course._id}`}>
+                      <button className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg shadow-md transition duration-300">
+                        Edit
                       </button>
-                    </div>
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setformId(course._id);
+                        handleDeleteUser();
+                      }}
+                      className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg shadow-md transition duration-300"
+                    >
+                      Cancel
+                    </button>
                   </div>
-                ))
-              ) : (
-                <div className="text-center text-gray-500 py-4">
-                  No records found
                 </div>
-              )}
-            </div>
+              ))
+            ) : (
+              <div className="text-center text-gray-500 py-4">
+                No records found
+              </div>
+            )}
           </div>
         </div>
       </div>
     </div>
+  </div>
+  
   );
 }
