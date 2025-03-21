@@ -15,16 +15,16 @@ const router = express.Router();
 router.post('/cappointments', createAppointment);
 
 // Get all appointments
-router.get('/appointments', getAppointments);
+router.get('/gappointments', getAppointments);
 
 // Get a single appointment by ID
 router.get('/appointments/:id', getAppointmentById);
 
 // Update an appointment by ID
-router.put('/appointments/:id', updateAppointment);
+router.put('/uappointments/:id', updateAppointment);
 
 // Delete an appointment by ID
-router.delete('/appointments/:id', deleteAppointment);
+router.delete('/ppointments/:id', deleteAppointment);
 
 router.post('/Cappointments', createdocter);
 
