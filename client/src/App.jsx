@@ -8,6 +8,8 @@ import Ap from "./pages/appoiment";
 import Aupdate from "./pages/Aupdate";
 
 
+import Homep from "./pages/homep";
+
 
 
 
@@ -21,8 +23,11 @@ export default function App() {
        
 
         <Route path="/updatee/:iddd" element={<Aupdate />} />
-        <Route path="/" element={<Record />} />
+        <Route path="/mya" element={<Record />} />
         <Route path="/add" element={<Ap/>} />
+
+
+        <Route path="/" element={<Homep/>} />
      
      
       </Routes>
