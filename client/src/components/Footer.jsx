@@ -6,7 +6,17 @@ import linkedin from "../img/linkedin.png";
 import youtube from "../img/youtube.png";
 
 export default function Footer() {
+
+
+
+
+
+
+
   return (
+
+
+
     <div className="bg-blue-600 border-t-2 border-gray-700 text-white">
       <div className="w-full max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">

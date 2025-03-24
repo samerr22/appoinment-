@@ -55,36 +55,35 @@ export default function ManageEmp() {
   }, [query, Info]);
 
   return (
-    <div className="h-[800px] relative">
+    <div className="h-[800px] relative bg-[url('https://firebasestorage.googleapis.com/v0/b/fir-8506f.appspot.com/o/nnkkkkkkkkkkkkkkkkkkkk.PNG?alt=media&token=0cfb779d-d6b8-4245-ac44-969868a12c5b')] bg-cover bg-center">
     <div className="items-center justify-center flex">
       <div className="items-center">
         {/* Add Appointment Button */}
-        <div className="w-full text-center mt-4 mb-6">
-          <Link to="/add">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-lg shadow-lg transition duration-300">
-              Add Appointment
-            </button>
-          </Link>
+        <div className="w-full text-center mt-8 mb-6">
+          <h1 className="text-2xl font-serif text-white shadow-xl shadow-blue-50">
+            My Appointment
+          </h1>
         </div>
   
-        <div className="lg:w-[1200px] mt-8 rounded-3xl shadow-xl bg-white overflow-hidden">
+        <div className="lg:w-[1200px] mt-8 rounded-3xl shadow-xl  overflow-hidden">
+        <div className="overflow-x-auto scrollbar-none lg:h-[600px] ">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
             {filter && filter.length > 0 ? (
               filter.map((course) => (
                 <div
                   key={course._id}
-                  className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-all"
+                  className="bg-blue-500 bg-opacity-80 p-6 rounded-lg shadow-lg hover:shadow-xl transition-all"
                 >
-                  <h3 className="text-xl font-semibold text-gray-800">
+                  <h3 className="text-xl text-white font-semibold ">
                     Patient: {course.patientName}
                   </h3>
-                  <p className="text-gray-600 mt-2">
+                  <p className="text-white mt-2">
                     <strong>Doctor:</strong> {course.doctorName}
                   </p>
-                  <p className="text-gray-600 mt-2">
+                  <p className="text-white mt-2">
                     <strong>Appointment Date:</strong> {course.appointmentDate}
                   </p>
-                  <p className="text-gray-600 mt-2">
+                  <p className="text-white mt-2">
                     <strong>Appointment Time:</strong> {course.appointmentTime}
                   </p>
   
@@ -111,6 +110,7 @@ export default function ManageEmp() {
                 No records found
               </div>
             )}
+          </div>
           </div>
         </div>
       </div>
